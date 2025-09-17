@@ -14,7 +14,16 @@
       "Bash(sudo tmutil listlocalsnapshots:*)",
       "Bash(chmod +x /Users/keliang/clean_my_mac/mac_deep_cleanup.sh)",
       "Bash(git init)",
-      "Bash(git add .)"
+      "Bash(git add .)",
+      "Bash(git branch -m main)",
+      "Bash(git config user.name \"Chenkeliang\")",
+      "Bash(git config user.email \"noreply@github.com\")",
+      "Bash(git commit -m \"$(cat <<''EOF''\n🎉 Mac智能清理工具 v1.0 发布\n\n✨ 新功能:\n- 🔒 默认安全清理选项，保护用户数据\n- 📊 实时进度显示和详细报告\n- 💾 自动备份重要文件\n- 🎛️ 交互式菜单选择\n- 🌍 适用于所有 macOS 系统\n\n🧹 清理项目:\n- Time Machine 本地快照清理\n- 开发工具缓存清理\n- 系统日志和缓存清理\n- 应用程序缓存清理\n- Downloads大文件智能检测\n\n🛡️ 安全特性:\n- 完整的操作日志记录\n- 自动备份机制\n- 错误处理和回滚\n\n🎯 目标用户:\n- 所有 macOS 用户\n- 开发者和普通用户\n- Intel 和 Apple Silicon Mac\n\n🤖 Generated with [Claude Code](https://claude.ai/code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git remote add origin git@github.com:Chenkeliang/cleanMyMac.git)",
+      "Bash(git push -u origin main)",
+      "Bash(git pull origin main --allow-unrelated-histories)",
+      "Bash(git config pull.rebase false)",
+      "Bash(git pull origin main)"
     ],
     "deny": [],
     "ask": []

@@ -33,12 +33,12 @@
 
 ```bash
 # 方式1: 直接下载脚本
-curl -O https://raw.githubusercontent.com/mac-cleanup/mac-smart-cleanup/main/mac_smart_cleanup.sh
+curl -O https://raw.githubusercontent.com/Chenkeliang/cleanMyMac/main/mac_smart_cleanup.sh
 chmod +x mac_smart_cleanup.sh
 
 # 方式2: 克隆整个项目
-git clone https://github.com/mac-cleanup/mac-smart-cleanup.git
-cd mac-smart-cleanup
+git clone https://github.com/Chenkeliang/cleanMyMac.git
+cd cleanMyMac
 ```
 
 ### 2. 运行清理工具
@@ -219,8 +219,8 @@ A: 这是正常现象，缓存重建需要时间，重启系统可以改善。
 3. **脚本执行失败**: 检查日志文件了解具体错误
 
 ### 反馈和贡献
-- **问题反馈**: [GitHub Issues](https://github.com/mac-cleanup/mac-smart-cleanup/issues)
-- **功能建议**: [GitHub Discussions](https://github.com/mac-cleanup/mac-smart-cleanup/discussions)
+- **问题反馈**: [GitHub Issues](https://github.com/Chenkeliang/cleanMyMac/issues)
+- **功能建议**: [GitHub Discussions](https://github.com/Chenkeliang/cleanMyMac/discussions)
 - **贡献代码**: 欢迎提交 Pull Request
 
 ## 📄 许可证

@@ -2,7 +2,7 @@
 # Mac 智能系统清理工具
 # 适用于所有 macOS 系统的磁盘空间优化
 # 版本: 1.0
-# 开源项目: https://github.com/mac-cleanup/mac-smart-cleanup
+# 开源项目: https://github.com/Chenkeliang/cleanMyMac
 
 set -e
 
