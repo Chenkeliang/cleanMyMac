@@ -137,11 +137,11 @@ show_cleanup_menu() {
 
     # 显示清理选项
     echo -e " 1. [$([ $CLEANUP_TIMEMACHINE_SNAPSHOTS -eq 1 ] && echo '✓' || echo ' ')] Time Machine 快照清理 (tmutil)           ${GREEN}(安全, 跳过系统更新快照)${NC}"
-    echo -e " 2. [$([ $CLEANUP_DEV_CACHES -eq 1 ] && echo '✓' || echo ' ')] 开发工具和应用缓存清理 (~/.cache, ~/Library/Caches)         ${GREEN}(安全, 可释放5-15GB)${NC}"
+    echo -e " 2. [$([ $CLEANUP_DEV_CACHES -eq 1 ] && echo '✓' || echo ' ')] 应用程序缓存清理 (开发工具+常用应用缓存)         ${GREEN}(安全, 可释放5-15GB)${NC}"
     echo -e " 3. [$([ $CLEANUP_SYSTEM_LOGS -eq 1 ] && echo '✓' || echo ' ')] 系统日志清理 (~/Library/Logs, /var/log)                   ${GREEN}(安全, 可释放1-3GB)${NC}"
     echo -e " 4. [$([ $CLEANUP_SLEEP_IMAGE -eq 1 ] && echo '✓' || echo ' ')] 休眠镜像清理 (/var/vm/sleepimage)                   ${GREEN}(安全, 可释放1GB)${NC}"
     echo -e " 5. [$([ $CLEANUP_SYSTEM_CACHES -eq 1 ] && echo '✓' || echo ' ')] 系统缓存清理 (QuickLook, DNS, 字体缓存)                   ${GREEN}(安全, 可释放2-5GB)${NC}"
-    echo -e " 6. [$([ $CLEANUP_APP_CACHES -eq 1 ] && echo '✓' || echo ' ')] 应用程序缓存清理 (~/Library/Application Support)               ${YELLOW}(谨慎, 可释放2-3GB)${NC}"
+    echo -e " 6. [$([ $CLEANUP_APP_CACHES -eq 1 ] && echo '✓' || echo ' ')] IDE扩展缓存清理 (VS Code/Cursor/Zed扩展)               ${YELLOW}(谨慎, 可释放2-3GB)${NC}"
     echo -e " 7. [$([ $CLEANUP_TRASH -eq 1 ] && echo '✓' || echo ' ')] 废纸篓清理 (~/.Trash)                       ${GREEN}(安全)${NC}"
     echo -e " 8. [$([ $CLEANUP_DOWNLOADS_VIDEOS -eq 1 ] && echo '✓' || echo ' ')] Downloads大文件清理 (~/Downloads)             ${YELLOW}(谨慎选择)${NC}"
     echo
