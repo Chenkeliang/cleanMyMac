@@ -22,7 +22,7 @@ BACKUP_DIR="$SCRIPT_DIR/backup_$(date +%Y%m%d_%H%M%S)"
 
 # 清理选项 (默认选中安全项目)
 CLEANUP_TIMEMACHINE_SNAPSHOTS=1    # Time Machine 本地快照 (默认选中)
-CLEANUP_DEV_CACHES=1               # 开发工具缓存 (默认选中)
+CLEANUP_DEV_CACHES=1               # 开发工具和应用缓存 (默认选中)
 CLEANUP_SYSTEM_LOGS=1              # 系统日志 (默认选中)
 CLEANUP_SLEEP_IMAGE=1              # 休眠镜像 (默认选中)
 CLEANUP_SYSTEM_CACHES=1            # 系统缓存 (默认选中)
@@ -128,7 +128,7 @@ show_cleanup_menu() {
 
     # 显示清理选项
     echo -e " 1. [$([ $CLEANUP_TIMEMACHINE_SNAPSHOTS -eq 1 ] && echo '✓' || echo ' ')] Time Machine 本地快照清理     ${GREEN}(推荐, 可释放大量空间)${NC}"
-    echo -e " 2. [$([ $CLEANUP_DEV_CACHES -eq 1 ] && echo '✓' || echo ' ')] 开发工具缓存清理               ${GREEN}(安全, 可释放3-5GB)${NC}"
+    echo -e " 2. [$([ $CLEANUP_DEV_CACHES -eq 1 ] && echo '✓' || echo ' ')] 开发工具和应用缓存清理         ${GREEN}(安全, 可释放5-15GB)${NC}"
     echo -e " 3. [$([ $CLEANUP_SYSTEM_LOGS -eq 1 ] && echo '✓' || echo ' ')] 系统日志清理                   ${GREEN}(安全, 可释放1-3GB)${NC}"
     echo -e " 4. [$([ $CLEANUP_SLEEP_IMAGE -eq 1 ] && echo '✓' || echo ' ')] 休眠镜像清理                   ${GREEN}(安全, 可释放1GB)${NC}"
     echo -e " 5. [$([ $CLEANUP_SYSTEM_CACHES -eq 1 ] && echo '✓' || echo ' ')] 系统缓存清理                   ${GREEN}(安全, 可释放2-5GB)${NC}"
@@ -228,47 +228,210 @@ cleanup_timemachine_snapshots() {
     log "SUCCESS" "Time Machine 快照清理完成"
 }
 
-# 开发工具缓存清理
+# 开发工具和应用程序缓存清理
 cleanup_dev_caches() {
     if [ $CLEANUP_DEV_CACHES -eq 0 ]; then
         return 0
     fi
 
-    log "INFO" "开始清理开发工具缓存..."
+    log "INFO" "开始清理开发工具和应用程序缓存..."
 
-    local caches=(
-        "$HOME/.cache/puppeteer"
-        "$HOME/.cache/github-copilot"
-        "$HOME/.cache/huggingface"
-        "$HOME/.cache/phpactor"
-        "$HOME/.cache/vscode-ripgrep"
+    # 开发工具缓存
+    local dev_caches=(
+        # Node.js 相关
         "$HOME/.npm"
+        "$HOME/.cache/npm"
+        "$HOME/.yarn/cache"
+        "$HOME/.pnpm-store"
+        "$HOME/.cache/yarn"
+
+        # Python 相关
+        "$HOME/.cache/pip"
+        "$HOME/.cache/pipenv"
+        "$HOME/Library/Caches/pip"
+        "$HOME/Library/Caches/pypoetry"
+        "$HOME/.pyenv/cache"
+        "$HOME/.conda/pkgs"
+
+        # Go 相关
+        "$HOME/go/pkg/mod/cache"
+        "$HOME/.cache/go-build"
         "$HOME/Library/Caches/go-build"
+
+        # Rust 相关
+        "$HOME/.cargo/registry/cache"
+        "$HOME/.cargo/git/db"
+
+        # Java 相关
+        "$HOME/.gradle/caches"
+        "$HOME/.m2/repository/.cache"
+
+        # Ruby 相关
+        "$HOME/.gem/cache"
+        "$HOME/.bundle/cache"
+
+        # AI/ML 工具缓存
+        "$HOME/.cache/huggingface"
+        "$HOME/.cache/github-copilot"
+        "$HOME/.cache/ollama"
+        "$HOME/.cache/openai"
+
+        # 浏览器自动化
+        "$HOME/.cache/puppeteer"
+        "$HOME/.cache/playwright"
+        "$HOME/.cache/selenium"
+
+        # 包管理器
         "$HOME/Library/Caches/Homebrew"
+        "$HOME/.cache/composer"
+
+        # 编辑器/IDE 相关
+        "$HOME/.cache/vscode-ripgrep"
+        "$HOME/.cache/phpactor"
+        "$HOME/.cache/typescript"
     )
 
-    local total=${#caches[@]}
-    local current=0
+    # Adobe 应用程序缓存 (仅清理缓存，保留配置)
+    local adobe_caches=(
+        "$HOME/Library/Caches/Adobe/After Effects"
+        "$HOME/Library/Caches/Adobe/Photoshop"
+        "$HOME/Library/Caches/Adobe/Illustrator"
+        "$HOME/Library/Caches/Adobe/Premiere Pro"
+        "$HOME/Library/Caches/Adobe/InDesign"
+        "$HOME/Library/Caches/Adobe/Lightroom"
+        "$HOME/Library/Caches/Adobe/Bridge"
+        "$HOME/Library/Caches/Adobe/Media Encoder"
+        "$HOME/Library/Caches/com.adobe.acc.AdobeCreativeCloud"
+    )
 
-    for cache_path in "${caches[@]}"; do
+    # 其他常用应用程序缓存
+    local app_caches=(
+        # Microsoft Office
+        "$HOME/Library/Caches/Microsoft/Office"
+        "$HOME/Library/Caches/com.microsoft.Word"
+        "$HOME/Library/Caches/com.microsoft.Excel"
+        "$HOME/Library/Caches/com.microsoft.Powerpoint"
+
+        # Google
+        "$HOME/Library/Caches/Google/Chrome/Default/Cache"
+        "$HOME/Library/Caches/com.google.Chrome"
+
+        # 媒体工具
+        "$HOME/Library/Caches/com.apple.FinalCutPro"
+        "$HOME/Library/Caches/com.apple.Motion"
+        "$HOME/Library/Caches/com.blackmagic-design.DaVinciResolve"
+
+        # 设计工具
+        "$HOME/Library/Caches/com.figma.Desktop"
+        "$HOME/Library/Caches/com.bohemiancoding.sketch3"
+        "$HOME/Library/Caches/com.framerx.framer-x"
+
+        # 通讯工具
+        "$HOME/Library/Caches/com.tencent.xinWeChat"
+        "$HOME/Library/Caches/com.microsoft.teams"
+        "$HOME/Library/Caches/com.discord.Discord"
+        "$HOME/Library/Caches/com.slack.Slack"
+        "$HOME/Library/Caches/us.zoom.xos"
+
+        # 开发工具
+        "$HOME/Library/Caches/com.docker.docker"
+        "$HOME/Library/Caches/com.postmanlabs.mac"
+        "$HOME/Library/Caches/com.github.GitHubDesktop"
+
+        # 其他工具
+        "$HOME/Library/Caches/com.spotify.client"
+        "$HOME/Library/Caches/com.apple.Safari/Webpage Previews"
+        "$HOME/Library/Caches/Firefox/Profiles/*/cache2"
+    )
+
+    # 合并所有缓存列表
+    local all_caches=("${dev_caches[@]}" "${adobe_caches[@]}" "${app_caches[@]}")
+    local total=${#all_caches[@]}
+    local current=0
+    local cleaned_count=0
+
+    log "INFO" "检查 $total 个缓存位置..."
+
+    for cache_path in "${all_caches[@]}"; do
         current=$((current + 1))
-        show_progress $current $total "清理缓存: $(basename "$cache_path")"
-        safe_remove "$cache_path" "开发工具缓存: $(basename "$cache_path")"
+        show_progress $current $total "检查缓存: $(basename "$cache_path")"
+
+        if [ -e "$cache_path" ]; then
+            local size_before=$(get_size "$cache_path")
+            if safe_remove "$cache_path" "应用缓存: $(basename "$cache_path")"; then
+                cleaned_count=$((cleaned_count + 1))
+                log "SUCCESS" "已清理缓存: $(basename "$cache_path") ($size_before)"
+            fi
+        fi
     done
 
-    # 清理 npm 缓存
+    # 清理包管理器缓存命令
+    local package_managers=(
+        # npm
+        "npm cache clean --force"
+        # yarn (如果存在)
+        "yarn cache clean"
+        # pip (如果存在)
+        "pip cache purge"
+        # conda (如果存在)
+        "conda clean --all --yes"
+        # Homebrew
+        "brew cleanup"
+        # gem (如果存在)
+        "gem cleanup"
+        # cargo (如果存在)
+        "cargo cache --autoclean"
+    )
+
+    log "INFO" "正在清理包管理器缓存..."
+
+    # npm 缓存清理
     if command -v npm &> /dev/null; then
         log "PROGRESS" "清理 npm 缓存..."
-        npm cache clean --force >/dev/null 2>&1 && log "SUCCESS" "npm 缓存已清理" || log "ERROR" "npm 缓存清理失败"
+        npm cache clean --force >/dev/null 2>&1 && log "SUCCESS" "npm 缓存已清理" || log "WARN" "npm 缓存清理失败"
     fi
 
-    # 清理 Homebrew 缓存
+    # Homebrew 缓存清理
     if command -v brew &> /dev/null; then
         log "PROGRESS" "清理 Homebrew 缓存..."
-        brew cleanup >/dev/null 2>&1 && log "SUCCESS" "Homebrew 缓存已清理" || log "ERROR" "Homebrew 缓存清理失败"
+        brew cleanup >/dev/null 2>&1 && log "SUCCESS" "Homebrew 缓存已清理" || log "WARN" "Homebrew 缓存清理失败"
     fi
 
-    log "SUCCESS" "开发工具缓存清理完成"
+    # Yarn 缓存清理
+    if command -v yarn &> /dev/null; then
+        log "PROGRESS" "清理 Yarn 缓存..."
+        yarn cache clean >/dev/null 2>&1 && log "SUCCESS" "Yarn 缓存已清理" || log "WARN" "Yarn 缓存清理失败"
+    fi
+
+    # pip 缓存清理
+    if command -v pip &> /dev/null; then
+        log "PROGRESS" "清理 pip 缓存..."
+        pip cache purge >/dev/null 2>&1 && log "SUCCESS" "pip 缓存已清理" || log "WARN" "pip 缓存清理失败"
+    fi
+
+    # conda 缓存清理
+    if command -v conda &> /dev/null; then
+        log "PROGRESS" "清理 conda 缓存..."
+        conda clean --all --yes >/dev/null 2>&1 && log "SUCCESS" "conda 缓存已清理" || log "WARN" "conda 缓存清理失败"
+    fi
+
+    # gem 缓存清理
+    if command -v gem &> /dev/null; then
+        log "PROGRESS" "清理 gem 缓存..."
+        gem cleanup >/dev/null 2>&1 && log "SUCCESS" "gem 缓存已清理" || log "WARN" "gem 缓存清理失败"
+    fi
+
+    # Docker 缓存清理 (如果用户选择)
+    if command -v docker &> /dev/null; then
+        echo -ne "${YELLOW}是否清理 Docker 缓存? 这会删除未使用的镜像和容器 (y/N): ${NC}"
+        read -r docker_confirm
+        if [[ $docker_confirm =~ ^[Yy]$ ]]; then
+            log "PROGRESS" "清理 Docker 缓存..."
+            docker system prune -f >/dev/null 2>&1 && log "SUCCESS" "Docker 缓存已清理" || log "WARN" "Docker 缓存清理失败"
+        fi
+    fi
+
+    log "SUCCESS" "缓存清理完成！已清理 $cleaned_count 个缓存位置"
 }
 
 # 系统日志清理

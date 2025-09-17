@@ -9,7 +9,7 @@
 | 清理项目 | 预估释放空间 | 安全等级 | 默认状态 |
 |---------|-------------|----------|----------|
 | **Time Machine 本地快照** | 大量空间 | 🟢 安全 | ✅ 默认选中 |
-| **开发工具缓存** | 3-5GB | 🟢 安全 | ✅ 默认选中 |
+| **开发工具和应用缓存** | 5-15GB | 🟢 安全 | ✅ 默认选中 |
 | **系统日志文件** | 1-3GB | 🟢 安全 | ✅ 默认选中 |
 | **休眠镜像** | 1GB | 🟢 安全 | ✅ 默认选中 |
 | **系统缓存** | 2-5GB | 🟢 安全 | ✅ 默认选中 |
@@ -64,16 +64,15 @@ cd cleanMyMac
 - **风险**: 无风险，快照会自动重建
 - **说明**: 这是最有效的清理方式，通常是"系统数据"占用过大的主要原因
 
-#### 2. 开发工具缓存
+#### 2. 开发工具和应用缓存
 - **清理内容**:
-  - Puppeteer 浏览器缓存
-  - GitHub Copilot AI 缓存
-  - HuggingFace 模型缓存
-  - npm 包缓存
-  - Go 编译缓存
-  - Homebrew 缓存
-- **释放空间**: 3-5GB
-- **风险**: 无风险，会自动重新下载
+  - **开发工具**: Node.js(npm/yarn), Python(pip), Go, Rust(cargo), Java(gradle/maven), Ruby(gem)
+  - **AI/ML工具**: HuggingFace, GitHub Copilot, OpenAI, Ollama
+  - **浏览器自动化**: Puppeteer, Playwright, Selenium
+  - **Adobe系列**: After Effects, Photoshop, Illustrator, Premiere Pro, Lightroom
+  - **其他应用**: Chrome, Microsoft Office, Final Cut Pro, Docker, Figma
+- **释放空间**: 5-15GB (根据安装的工具而定)
+- **风险**: 无风险，会自动重新下载或重建缓存
 
 #### 3. 系统日志文件
 - **清理内容**:
@@ -147,7 +146,7 @@ cd cleanMyMac
 请选择要执行的清理项目 (默认已选中安全项目):
 
  1. [✓] Time Machine 本地快照清理     (推荐, 可释放大量空间)
- 2. [✓] 开发工具缓存清理               (安全, 可释放3-5GB)
+ 2. [✓] 开发工具和应用缓存清理         (安全, 可释放5-15GB)
  3. [✓] 系统日志清理                   (安全, 可释放1-3GB)
  4. [✓] 休眠镜像清理                   (安全, 可释放1GB)
  5. [✓] 系统缓存清理                   (安全, 可释放2-5GB)

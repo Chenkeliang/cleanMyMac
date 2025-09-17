@@ -23,7 +23,9 @@
       "Bash(git push -u origin main)",
       "Bash(git pull origin main --allow-unrelated-histories)",
       "Bash(git config pull.rebase false)",
-      "Bash(git pull origin main)"
+      "Bash(git pull origin main)",
+      "Bash(git push origin main --force)",
+      "Bash(chmod +x /Users/keliang/clean_my_mac/mac_smart_cleanup.sh)"
     ],
     "deny": [],
     "ask": []
