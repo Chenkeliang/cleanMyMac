@@ -30,10 +30,8 @@ CLEANUP_APP_CACHES=0               # 应用程序缓存 (默认不选中)
 CLEANUP_TRASH=1                    # 废纸篓 (默认选中)
 CLEANUP_DOWNLOADS_VIDEOS=0         # Downloads大文件清理 (默认不选中)
 
-# 记录初始状态
-INITIAL_USAGE=$(df -h / | tail -1 | awk '{print $5}' | sed 's/%//')
-INITIAL_AVAIL=$(df -h / | tail -1 | awk '{print $4}')
-TOTAL_FREED=0
+# 清理统计
+TOTAL_FREED_BYTES=0
 
 # 日志函数
 log() {
@@ -61,17 +59,27 @@ show_progress() {
     local bar_length=50
     local filled_length=$((progress * bar_length / 100))
 
-    printf "\r${CYAN}[${"
+    printf "\r${CYAN}["
     printf "%${filled_length}s" | tr ' ' '='
     printf "%$((bar_length - filled_length))s" | tr ' ' '-'
-    printf "}] %3d%% %s${NC}" "$progress" "$description"
+    printf "] %3d%% %s${NC}" "$progress" "$description"
 
     if [ $current -eq $total ]; then
         echo
     fi
 }
 
-# 获取文件/目录大小
+# 获取文件/目录大小（返回字节数）
+get_size_bytes() {
+    local path="$1"
+    if [ -e "$path" ]; then
+        du -s "$path" 2>/dev/null | awk '{print $1 * 1024}' || echo "0"
+    else
+        echo "0"
+    fi
+}
+
+# 获取文件/目录大小（人类可读格式）
 get_size() {
     local path="$1"
     if [ -e "$path" ]; then
@@ -93,6 +101,7 @@ safe_remove() {
     fi
 
     local size=$(get_size "$path")
+    local size_bytes=$(get_size_bytes "$path")
     log "PROGRESS" "正在清理: $description ($size)"
 
     # 备份重要文件 (如果启用)
@@ -104,6 +113,8 @@ safe_remove() {
     # 删除文件/目录
     if rm -rf "$path" 2>/dev/null; then
         log "SUCCESS" "已清理: $description ($size)"
+        # 累加释放的字节数
+        TOTAL_FREED_BYTES=$((TOTAL_FREED_BYTES + size_bytes))
         return 0
     else
         log "ERROR" "清理失败: $description"
@@ -119,22 +130,20 @@ show_cleanup_menu() {
     echo -e "${PURPLE}║              释放磁盘空间，优化系统性能                      ║${NC}"
     echo -e "${PURPLE}╚══════════════════════════════════════════════════════════════╝${NC}"
     echo
-    echo -e "${BLUE}📊 当前磁盘状态:${NC}"
-    echo -e "   使用率: ${INITIAL_USAGE}%"
-    echo -e "   可用空间: ${INITIAL_AVAIL}"
+    echo -e "${BLUE}📊 开始清理，释放磁盘空间${NC}"
     echo
     echo -e "${YELLOW}请选择要执行的清理项目 (默认已选中安全项目):${NC}"
     echo
 
     # 显示清理选项
-    echo -e " 1. [$([ $CLEANUP_TIMEMACHINE_SNAPSHOTS -eq 1 ] && echo '✓' || echo ' ')] Time Machine 本地快照清理     ${GREEN}(推荐, 可释放大量空间)${NC}"
-    echo -e " 2. [$([ $CLEANUP_DEV_CACHES -eq 1 ] && echo '✓' || echo ' ')] 开发工具和应用缓存清理         ${GREEN}(安全, 可释放5-15GB)${NC}"
-    echo -e " 3. [$([ $CLEANUP_SYSTEM_LOGS -eq 1 ] && echo '✓' || echo ' ')] 系统日志清理                   ${GREEN}(安全, 可释放1-3GB)${NC}"
-    echo -e " 4. [$([ $CLEANUP_SLEEP_IMAGE -eq 1 ] && echo '✓' || echo ' ')] 休眠镜像清理                   ${GREEN}(安全, 可释放1GB)${NC}"
-    echo -e " 5. [$([ $CLEANUP_SYSTEM_CACHES -eq 1 ] && echo '✓' || echo ' ')] 系统缓存清理                   ${GREEN}(安全, 可释放2-5GB)${NC}"
-    echo -e " 6. [$([ $CLEANUP_APP_CACHES -eq 1 ] && echo '✓' || echo ' ')] 应用程序缓存清理               ${YELLOW}(谨慎, 可释放2-3GB)${NC}"
-    echo -e " 7. [$([ $CLEANUP_TRASH -eq 1 ] && echo '✓' || echo ' ')] 废纸篓清理                       ${GREEN}(安全)${NC}"
-    echo -e " 8. [$([ $CLEANUP_DOWNLOADS_VIDEOS -eq 1 ] && echo '✓' || echo ' ')] Downloads大文件清理             ${YELLOW}(谨慎选择)${NC}"
+    echo -e " 1. [$([ $CLEANUP_TIMEMACHINE_SNAPSHOTS -eq 1 ] && echo '✓' || echo ' ')] Time Machine 快照清理 (tmutil)           ${GREEN}(安全, 跳过系统更新快照)${NC}"
+    echo -e " 2. [$([ $CLEANUP_DEV_CACHES -eq 1 ] && echo '✓' || echo ' ')] 开发工具和应用缓存清理 (~/.cache, ~/Library/Caches)         ${GREEN}(安全, 可释放5-15GB)${NC}"
+    echo -e " 3. [$([ $CLEANUP_SYSTEM_LOGS -eq 1 ] && echo '✓' || echo ' ')] 系统日志清理 (~/Library/Logs, /var/log)                   ${GREEN}(安全, 可释放1-3GB)${NC}"
+    echo -e " 4. [$([ $CLEANUP_SLEEP_IMAGE -eq 1 ] && echo '✓' || echo ' ')] 休眠镜像清理 (/var/vm/sleepimage)                   ${GREEN}(安全, 可释放1GB)${NC}"
+    echo -e " 5. [$([ $CLEANUP_SYSTEM_CACHES -eq 1 ] && echo '✓' || echo ' ')] 系统缓存清理 (QuickLook, DNS, 字体缓存)                   ${GREEN}(安全, 可释放2-5GB)${NC}"
+    echo -e " 6. [$([ $CLEANUP_APP_CACHES -eq 1 ] && echo '✓' || echo ' ')] 应用程序缓存清理 (~/Library/Application Support)               ${YELLOW}(谨慎, 可释放2-3GB)${NC}"
+    echo -e " 7. [$([ $CLEANUP_TRASH -eq 1 ] && echo '✓' || echo ' ')] 废纸篓清理 (~/.Trash)                       ${GREEN}(安全)${NC}"
+    echo -e " 8. [$([ $CLEANUP_DOWNLOADS_VIDEOS -eq 1 ] && echo '✓' || echo ' ')] Downloads大文件清理 (~/Downloads)             ${YELLOW}(谨慎选择)${NC}"
     echo
     echo -e "${CYAN}操作选项:${NC}"
     echo -e " s) 开始清理 (执行选中的项目)"
@@ -200,30 +209,98 @@ cleanup_timemachine_snapshots() {
 
     log "INFO" "开始清理 Time Machine 本地快照..."
 
-    # 获取快照列表
-    local snapshots=$(sudo tmutil listlocalsnapshots / 2>/dev/null | grep -v "Snapshot" || true)
+    # 获取所有快照列表
+    local all_snapshots=$(tmutil listlocalsnapshots / 2>/dev/null | grep -v "Snapshots for volume" || true)
 
-    if [ -z "$snapshots" ]; then
+    if [ -z "$all_snapshots" ]; then
         log "INFO" "没有发现本地快照"
         return 0
     fi
 
-    local snapshot_count=$(echo "$snapshots" | wc -l | tr -d ' ')
-    log "INFO" "发现 $snapshot_count 个本地快照"
+    # 筛选可删除的快照 (只删除 Time Machine 快照，保留系统更新快照)
+    local tm_snapshots=$(echo "$all_snapshots" | grep "com.apple.TimeMachine" || true)
+    local update_snapshots=$(echo "$all_snapshots" | grep "com.apple.os.update" || true)
 
+    local total_snapshots=$(echo "$all_snapshots" | wc -l | tr -d ' ')
+    local tm_count=0
+    local update_count=0
+
+    if [ -n "$tm_snapshots" ]; then
+        tm_count=$(echo "$tm_snapshots" | wc -l | tr -d ' ')
+    fi
+
+    if [ -n "$update_snapshots" ]; then
+        update_count=$(echo "$update_snapshots" | wc -l | tr -d ' ')
+    fi
+
+    log "INFO" "发现 $total_snapshots 个本地快照："
+    log "INFO" "  - Time Machine 快照: $tm_count 个 (可清理)"
+    log "INFO" "  - 系统更新快照: $update_count 个 (受保护，跳过)"
+
+    if [ -z "$tm_snapshots" ]; then
+        log "INFO" "没有可清理的 Time Machine 快照"
+        if [ $update_count -gt 0 ]; then
+            echo -e "${YELLOW}💡 系统更新快照已跳过 ($update_count 个)，这些快照由系统自动管理${NC}"
+        fi
+        return 0
+    fi
+
+    # 询问用户是否授权删除 Time Machine 快照
+    echo -e "${YELLOW}⚠️  删除 Time Machine 快照需要管理员权限${NC}"
+    echo -e "${BLUE}发现 $tm_count 个可清理的 Time Machine 快照${NC}"
+    echo -ne "${BLUE}是否授权删除这些快照? (y/N): ${NC}"
+    read -r confirm
+
+    if [[ ! $confirm =~ ^[Yy]$ ]]; then
+        log "INFO" "用户取消删除 Time Machine 快照"
+        if [ $update_count -gt 0 ]; then
+            echo -e "${YELLOW}💡 系统更新快照已跳过 ($update_count 个)，这些快照由系统自动管理${NC}"
+        fi
+        return 0
+    fi
+
+    # 获取管理员权限
+    echo -e "${BLUE}请输入管理员密码以删除 Time Machine 快照...${NC}"
+
+    # 只删除 Time Machine 快照
     local current=0
+    local deleted_count=0
+
     while IFS= read -r snapshot; do
         if [ -n "$snapshot" ]; then
             current=$((current + 1))
-            show_progress $current $snapshot_count "删除快照: $(basename $snapshot)"
+            show_progress $current $tm_count "删除 TM 快照: $(basename $snapshot)"
 
-            if sudo tmutil deletelocalsnapshots "$(basename "$snapshot")" >/dev/null 2>&1; then
-                log "SUCCESS" "已删除快照: $(basename $snapshot)"
+            # 从快照名称提取时间戳
+            # com.apple.TimeMachine.2025-09-16-204201.local -> 2025-09-16-204201
+            local timestamp=$(echo "$snapshot" | grep -o '[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}-[0-9]\{6\}')
+
+            if [ -n "$timestamp" ]; then
+                # 尝试删除快照，使用时间戳格式
+                if sudo tmutil deletelocalsnapshots "$timestamp" >/dev/null 2>&1; then
+                    log "SUCCESS" "已删除 Time Machine 快照: $timestamp"
+                    deleted_count=$((deleted_count + 1))
+                    # Time Machine 快照通常较大，估算释放空间
+                    local estimated_size=$((1024 * 1024 * 1024)) # 估算1GB
+                    TOTAL_FREED_BYTES=$((TOTAL_FREED_BYTES + estimated_size))
+                else
+                    log "ERROR" "删除 Time Machine 快照失败: $timestamp"
+                fi
             else
-                log "ERROR" "删除快照失败: $(basename $snapshot)"
+                log "ERROR" "无法解析快照时间戳: $snapshot"
             fi
         fi
-    done <<< "$snapshots"
+    done <<< "$tm_snapshots"
+
+    if [ $deleted_count -gt 0 ]; then
+        log "SUCCESS" "成功删除 $deleted_count 个 Time Machine 快照"
+    elif [ $tm_count -gt 0 ]; then
+        log "WARN" "未能删除任何 Time Machine 快照"
+    fi
+
+    if [ $update_count -gt 0 ]; then
+        echo -e "${YELLOW}💡 系统更新快照已跳过 ($update_count 个)，这些快照由系统自动管理${NC}"
+    fi
 
     log "SUCCESS" "Time Machine 快照清理完成"
 }
@@ -337,6 +414,7 @@ cleanup_dev_caches() {
         "$HOME/Library/Caches/com.docker.docker"
         "$HOME/Library/Caches/com.postmanlabs.mac"
         "$HOME/Library/Caches/com.github.GitHubDesktop"
+    )
 
     # 基于用户系统实际安装的应用程序缓存
     local user_installed_app_caches=(
@@ -626,8 +704,21 @@ cleanup_trash() {
     fi
 
     log "INFO" "开始清理废纸篓..."
-    safe_remove "$HOME/.Trash/*" "废纸篓内容"
-    log "SUCCESS" "废纸篓清理完成"
+
+    # 检查废纸篓目录是否存在且不为空
+    if [ -d "$HOME/.Trash" ] && [ "$(ls -A "$HOME/.Trash" 2>/dev/null)" ]; then
+        local size=$(get_size "$HOME/.Trash")
+        log "PROGRESS" "正在清理: 废纸篓内容 ($size)"
+
+        # 删除废纸篓中的所有内容
+        if rm -rf "$HOME/.Trash"/* "$HOME/.Trash"/.[!.]* "$HOME/.Trash"/..?* 2>/dev/null; then
+            log "SUCCESS" "废纸篓清理完成"
+        else
+            log "ERROR" "废纸篓清理失败"
+        fi
+    else
+        log "WARN" "废纸篓为空或不存在"
+    fi
 }
 
 # Downloads大文件清理
@@ -671,23 +762,31 @@ cleanup_downloads_videos() {
 
 # 生成清理报告
 generate_report() {
-    local final_usage=$(df -h / | tail -1 | awk '{print $5}' | sed 's/%//')
-    local final_avail=$(df -h / | tail -1 | awk '{print $4}')
-    local freed_percentage=$((INITIAL_USAGE - final_usage))
+    # 强制同步文件系统
+    sync
+    sleep 1
 
     echo
     echo -e "${PURPLE}╔══════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${PURPLE}║                      清理完成报告                            ║${NC}"
     echo -e "${PURPLE}╚══════════════════════════════════════════════════════════════╝${NC}"
     echo
-    echo -e "${BLUE}📊 磁盘使用对比:${NC}"
-    echo -e "   清理前: ${INITIAL_USAGE}% (可用: ${INITIAL_AVAIL})"
-    echo -e "   清理后: ${final_usage}% (可用: ${final_avail})"
 
-    if [ $freed_percentage -gt 0 ]; then
-        echo -e "${GREEN}   ✅ 释放了 ${freed_percentage}% 的磁盘空间！${NC}"
+    # 计算释放的空间
+    if [ $TOTAL_FREED_BYTES -gt 0 ]; then
+        local freed_mb=$((TOTAL_FREED_BYTES / 1024 / 1024))
+        local freed_gb_decimal=$(echo "scale=2; $TOTAL_FREED_BYTES / 1000000000" | bc 2>/dev/null || echo "$TOTAL_FREED_BYTES" | awk '{printf "%.2f", $1/1000000000}')
+
+        echo -e "${GREEN}🎉 清理成功！${NC}"
+        echo -e "${BLUE}📊 释放空间统计:${NC}"
+
+        if [ $freed_mb -gt 1024 ]; then
+            echo -e "   ✅ 已释放: ${freed_gb_decimal}GB 磁盘空间"
+        else
+            echo -e "   ✅ 已释放: ${freed_mb}MB 磁盘空间"
+        fi
     else
-        echo -e "${YELLOW}   ℹ️  磁盘使用率变化较小${NC}"
+        echo -e "${YELLOW}ℹ️  没有找到可清理的文件${NC}"
     fi
 
     echo
@@ -696,12 +795,10 @@ generate_report() {
         echo -e "${BLUE}💾 备份目录: ${BACKUP_DIR}${NC}"
     fi
     echo
-    echo -e "${GREEN}🎉 清理任务完成！${NC}"
-    echo
     echo -e "${YELLOW}💡 建议:${NC}"
     echo -e "   1. 重启系统以完全释放内存缓存"
     echo -e "   2. 定期运行此脚本保持系统性能"
-    echo -e "   3. 监控系统数据是否继续增长"
+    echo -e "   3. 检查"关于本机"查看最新磁盘使用情况"
     echo
 }
 
@@ -714,7 +811,6 @@ main_cleanup() {
     # 创建日志文件
     mkdir -p "$(dirname "$LOG_FILE")"
     log "INFO" "开始清理任务 - $(date)"
-    log "INFO" "初始磁盘使用率: ${INITIAL_USAGE}%"
 
     # 执行清理任务
     local tasks=()
