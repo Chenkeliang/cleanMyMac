@@ -25,7 +25,9 @@
       "Bash(git config pull.rebase false)",
       "Bash(git pull origin main)",
       "Bash(git push origin main --force)",
-      "Bash(chmod +x /Users/keliang/clean_my_mac/mac_smart_cleanup.sh)"
+      "Bash(chmod +x /Users/keliang/clean_my_mac/mac_smart_cleanup.sh)",
+      "Bash(git commit -m \"$(cat <<''EOF''\n✨ 大幅扩展应用缓存清理功能\n\n🎯 新增支持的应用和工具:\n• 开发语言和工具\n  - Python: pip, pipenv, poetry, pyenv, conda\n  - Node.js: npm, yarn, pnpm\n  - Go: go modules, build cache\n  - Rust: cargo registry, git cache\n  - Java: gradle, maven\n  - Ruby: gem, bundle\n\n• AI/ML 工具\n  - HuggingFace, GitHub Copilot, OpenAI, Ollama\n  - 浏览器自动化: Puppeteer, Playwright, Selenium\n\n• Adobe 创意套件\n  - After Effects, Photoshop, Illustrator\n  - Premiere Pro, Lightroom, Bridge, Media Encoder\n\n• 常用应用程序\n  - Microsoft Office (Word, Excel, PowerPoint)\n  - Google Chrome, Safari, Firefox\n  - Final Cut Pro, Motion, DaVinci Resolve\n  - Figma, Sketch, Framer X\n  - 通讯工具: 微信, Teams, Discord, Slack, Zoom\n  - 开发工具: Docker, Postman, GitHub Desktop\n\n🛡️ 安全特性:\n- 只清理缓存文件，完全保留用户配置和数据\n- 智能检测工具是否安装\n- Docker清理需要用户确认\n- 详细的清理进度和结果报告\n\n📊 预计释放空间: 5-15GB (根据安装的工具数量)\n\n🤖 Generated with [Claude Code](https://claude.ai/code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push origin main)"
     ],
     "deny": [],
     "ask": []

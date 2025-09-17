@@ -338,19 +338,103 @@ cleanup_dev_caches() {
         "$HOME/Library/Caches/com.postmanlabs.mac"
         "$HOME/Library/Caches/com.github.GitHubDesktop"
 
-        # 其他工具
-        "$HOME/Library/Caches/com.spotify.client"
+    # 基于用户系统实际安装的应用程序缓存
+    local user_installed_app_caches=(
+        # JetBrains IDE系列 (已安装: IntelliJ IDEA, DataGrip)
+        "$HOME/Library/Caches/JetBrains/IntelliJIdea*"
+        "$HOME/Library/Caches/JetBrains/DataGrip*"
+        "$HOME/Library/Application Support/JetBrains/IntelliJIdea*/caches"
+        "$HOME/Library/Application Support/JetBrains/DataGrip*/caches"
+        "$HOME/Library/Application Support/JetBrains/IntelliJIdea*/tmp"
+        "$HOME/Library/Application Support/JetBrains/DataGrip*/tmp"
+
+        # 代码编辑器 (已安装: VS Code, Cursor, Zed)
+        "$HOME/Library/Caches/com.microsoft.VSCode"
+        "$HOME/Library/Caches/com.todesktop.230313mzl4w4u92" # Cursor
+        "$HOME/Library/Application Support/Code/CachedExtensions"
+        "$HOME/Library/Application Support/Code/logs"
+        "$HOME/Library/Application Support/Cursor/CachedExtensions"
+        "$HOME/Library/Application Support/Cursor/logs"
+        "$HOME/Library/Application Support/Zed/languages/*/cache"
+        "$HOME/Library/Application Support/Zed/extensions/*/cache"
+
+        # 浏览器 (已安装: Chrome, Edge, Safari)
+        "$HOME/Library/Caches/Google/Chrome/Default/Cache"
+        "$HOME/Library/Caches/Google/Chrome/Profile */Cache"
+        "$HOME/Library/Caches/com.google.Chrome"
+        "$HOME/Library/Caches/com.microsoft.edgemac"
         "$HOME/Library/Caches/com.apple.Safari/Webpage Previews"
-        "$HOME/Library/Caches/Firefox/Profiles/*/cache2"
+        "$HOME/Library/Caches/com.apple.Safari/TouchIconCache"
+
+        # 中国应用 (已安装: 微信, QQ, 钉钉, 企业微信, 网易云音乐, 小红书)
+        "$HOME/Library/Caches/com.tencent.xinWeChat" # 微信
+        "$HOME/Library/Caches/com.tencent.qq" # QQ
+        "$HOME/Library/Caches/com.alibaba.DingTalkMac" # 钉钉
+        "$HOME/Library/Caches/com.tencent.WeWorkMac" # 企业微信
+        "$HOME/Library/Caches/com.netease.163music" # 网易云音乐
+        "$HOME/Library/Caches/com.xingin.discover" # 小红书
+        "$HOME/Library/Caches/com.youku.mac" # 优酷
+        "$HOME/Library/Caches/com.tencent.tenvideo" # 腾讯视频
+        "$HOME/Library/Caches/com.tencent.weread" # 微信读书
+
+        # 开发工具 (已安装: iTerm, Sourcetree, OrbStack)
+        "$HOME/Library/Caches/com.googlecode.iterm2"
+        "$HOME/Library/Caches/com.torusknot.SourceTreeNotMAS"
+        "$HOME/Library/Caches/dev.orbstack.OrbStack"
+        "$HOME/Library/Application Support/OrbStack/cache"
+
+        # 媒体和娱乐 (已安装: IINA, Infuse, GarageBand)
+        "$HOME/Library/Caches/com.colliderli.iina"
+        "$HOME/Library/Caches/com.firecore.infuse"
+        "$HOME/Library/Caches/com.apple.garageband10"
+
+        # 实用工具 (已安装: Raycast, Hidden Bar, DaisyDisk)
+        "$HOME/Library/Caches/com.raycast.macos"
+        "$HOME/Library/Caches/com.dwarvesv.minimalbar"
+        "$HOME/Library/Caches/com.daisydiskapp.DaisyDiskStandAlone"
+        "$HOME/Library/Caches/com.charliemonroe.Downie"
+        "$HOME/Library/Caches/cc.ffitch.shottr"
+
+        # 安全工具 (已安装: Bitwarden, ClashX Pro)
+        "$HOME/Library/Caches/com.bitwarden.desktop"
+        "$HOME/Library/Caches/com.west2online.ClashX.Pro"
+
+        # 办公软件 (已安装: WPS Office, 腾讯柠檬)
+        "$HOME/Library/Caches/com.kingsoft.wpsoffice.mac"
+        "$HOME/Library/Caches/com.tencent.Lemon"
+
+        # 通讯工具 (已安装: Telegram, Discord, Lark)
+        "$HOME/Library/Caches/ru.keepcoder.Telegram"
+        "$HOME/Library/Caches/com.discord.Discord"
+        "$HOME/Library/Caches/com.electron.lark"
+
+        # 游戏和娱乐 (已安装: WeGame, MuMu模拟器)
+        "$HOME/Library/Caches/com.tencent.start.mac.wegame"
+        "$HOME/Library/Caches/com.netease.mumu.nemux"
+
+        # API工具 (已安装: Apifox, Charles)
+        "$HOME/Library/Caches/cn.apifox.app"
+        "$HOME/Library/Caches/com.xk72.charles"
+
+        # 系统工具 (已安装: Karabiner-Elements, Input Source Pro)
+        "$HOME/Library/Caches/org.pqrs.Karabiner-Elements"
+        "$HOME/Library/Caches/com.runjuu.InputSourcePro"
+
+        # 其他工具 (已安装: Bob, Logseq, Fig, Qoder)
+        "$HOME/Library/Caches/com.ripperhe.Bob"
+        "$HOME/Library/Caches/com.logseq.Logseq"
+        "$HOME/Library/Caches/com.fig.fig"
+        "$HOME/Library/Caches/com.qoder.qoder"
+        "$HOME/Library/Application Support/Qoder/SharedClientCache"
     )
 
     # 合并所有缓存列表
-    local all_caches=("${dev_caches[@]}" "${adobe_caches[@]}" "${app_caches[@]}")
+    local all_caches=("${dev_caches[@]}" "${adobe_caches[@]}" "${app_caches[@]}" "${user_installed_app_caches[@]}")
     local total=${#all_caches[@]}
     local current=0
     local cleaned_count=0
 
-    log "INFO" "检查 $total 个缓存位置..."
+    log "INFO" "检查 $total 个缓存位置 (包含您系统已安装的应用)..."
 
     for cache_path in "${all_caches[@]}"; do
         current=$((current + 1))
