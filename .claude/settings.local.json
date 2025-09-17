@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sudo du:*)",
+      "Read(//Users/keliang/**)",
+      "Bash(find:*)",
+      "Read(//Applications/**)",
+      "Read(//private/var/folders/**)",
+      "Bash(sudo find /private/var/folders -name \"*.cache\" -o -name \"*cache*\" -type d)",
+      "Bash(docker:*)",
+      "Read(//private/var/**)",
+      "Bash(sudo find:*)",
+      "Read(//System/Volumes/Data/**)",
+      "Bash(sudo tmutil listlocalsnapshots:*)",
+      "Bash(chmod +x /Users/keliang/clean_my_mac/mac_deep_cleanup.sh)",
+      "Bash(git init)",
+      "Bash(git add .)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
