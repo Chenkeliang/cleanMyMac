@@ -66,11 +66,23 @@ cd cleanMyMac
 
 #### 2. 开发工具和应用缓存
 - **清理内容**:
-  - **开发工具**: Node.js(npm/yarn), Python(pip), Go, Rust(cargo), Java(gradle/maven), Ruby(gem)
+  - **开发工具**: Node.js(npm/yarn/pnpm), Python(pip/pipenv/poetry/pyenv/conda), Go, Rust(cargo), Java(gradle/maven), Ruby(gem), Homebrew, Composer
   - **AI/ML工具**: HuggingFace, GitHub Copilot, OpenAI, Ollama
   - **浏览器自动化**: Puppeteer, Playwright, Selenium
-  - **Adobe系列**: After Effects, Photoshop, Illustrator, Premiere Pro, Lightroom
-  - **其他应用**: Chrome, Microsoft Office, Final Cut Pro, Docker, Figma
+  - **Adobe创意套件**: After Effects, Photoshop, Illustrator, Premiere Pro, InDesign, Lightroom, Bridge, Media Encoder, Creative Cloud
+  - **开发环境**:
+    - **IDE**: IntelliJ IDEA, DataGrip, VS Code, Cursor, Zed
+    - **终端工具**: iTerm2, Sourcetree, OrbStack
+    - **API工具**: Postman, Apifox, Charles
+  - **浏览器**: Google Chrome, Microsoft Edge, Safari
+  - **办公软件**: Microsoft Office (Word/Excel/PowerPoint), WPS Office
+  - **媒体工具**: Final Cut Pro, Motion, DaVinci Resolve, IINA, Infuse, GarageBand
+  - **设计工具**: Figma, Sketch, Framer X
+  - **中国应用**: 微信, QQ, 钉钉, 企业微信, 网易云音乐, 小红书, 优酷, 腾讯视频, 微信读书, WeGame, MuMu模拟器
+  - **通讯工具**: Teams, Discord, Slack, Zoom, Telegram, Lark
+  - **实用工具**: Raycast, Hidden Bar, DaisyDisk, Downie, Shottr, Bitwarden, ClashX Pro, 腾讯柠檬
+  - **系统工具**: Docker, GitHub Desktop, Karabiner-Elements, Input Source Pro
+  - **其他**: Bob翻译, Logseq, Fig, Qoder
 - **释放空间**: 5-15GB (根据安装的工具而定)
 - **风险**: 无风险，会自动重新下载或重建缓存
 
@@ -112,6 +124,63 @@ cd cleanMyMac
 - **清理内容**: 下载文件夹中的大文件 (>100MB)
 - **释放空间**: 取决于文件数量
 - **风险**: 用户数据丢失
+
+### 📱 支持的应用程序 (75+)
+
+本工具智能识别并清理以下应用程序的缓存文件：
+
+#### 开发工具和环境
+- **IDE**: IntelliJ IDEA, DataGrip, VS Code, Cursor, Zed
+- **语言环境**: Node.js, Python, Go, Rust, Java, Ruby, PHP
+- **包管理器**: npm, yarn, pnpm, pip, conda, cargo, gem, homebrew
+- **版本控制**: Git, GitHub Desktop, Sourcetree
+- **容器**: Docker, OrbStack
+- **终端**: iTerm2
+- **API工具**: Postman, Apifox, Charles
+
+#### Adobe 创意套件
+- After Effects, Photoshop, Illustrator, Premiere Pro
+- InDesign, Lightroom, Bridge, Media Encoder
+- Creative Cloud
+
+#### 浏览器和网络
+- Google Chrome, Microsoft Edge, Safari
+- Puppeteer, Playwright, Selenium (自动化工具)
+
+#### AI/ML 工具
+- HuggingFace, GitHub Copilot, OpenAI, Ollama
+
+#### 办公和生产力
+- Microsoft Office (Word, Excel, PowerPoint)
+- WPS Office, 腾讯柠檬
+
+#### 媒体和娱乐
+- Final Cut Pro, Motion, DaVinci Resolve
+- IINA, Infuse, GarageBand
+- 网易云音乐, 优酷, 腾讯视频, 微信读书
+
+#### 设计工具
+- Figma, Sketch, Framer X
+
+#### 中国应用生态
+- **社交通讯**: 微信, QQ, 钉钉, 企业微信
+- **内容平台**: 小红书, 微信读书
+- **游戏娱乐**: WeGame, MuMu模拟器
+
+#### 国际通讯工具
+- Microsoft Teams, Discord, Slack, Zoom
+- Telegram, Lark
+
+#### 实用工具
+- Raycast, Hidden Bar, DaisyDisk
+- Downie, Shottr, Bob翻译
+- Bitwarden, ClashX Pro
+
+#### 系统工具
+- Karabiner-Elements, Input Source Pro
+- Logseq, Fig, Qoder
+
+> **安全保障**: 所有清理操作仅针对缓存文件，完全保留用户配置、数据和偏好设置。
 
 ### 🛡️ 安全机制
 
